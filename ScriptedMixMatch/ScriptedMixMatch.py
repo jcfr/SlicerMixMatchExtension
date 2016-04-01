@@ -4,6 +4,17 @@ import vtk, qt, ctk, slicer
 from slicer.ScriptedLoadableModule import *
 import logging
 
+def _workaround_issue_3730(moduleName):
+  if moduleName != 'ScriptedMixMatch':
+    return
+  import sys
+  logic_path=os.path.join(os.path.dirname(slicer.modules.scriptedmixmatch.path), '../qt-loadable-modules')
+  sys.path.append(logic_path)
+  sys.path.append(os.path.join(logic_path, './Python'))
+  import vtkSlicerScriptedMixMatchModuleLogic
+  setattr(slicer, 'vtkSlicerScriptedMixMatchLogic', vtkSlicerScriptedMixMatchModuleLogic.vtkSlicerScriptedMixMatchLogic)
+
+
 #
 # ScriptedMixMatch
 #
@@ -27,6 +38,9 @@ class ScriptedMixMatch(ScriptedLoadableModule):
     This file was originally developed by Jean-Christophe Fillion-Robin, Kitware Inc.
     and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR013218-12S1.
 """ # replace with organization, grant and thanks.
+
+    # Install workaround for issue #3730
+    slicer.app.moduleManager().connect('moduleLoaded(QString)', _workaround_issue_3730)
 
 #
 # ScriptedMixMatchWidget
